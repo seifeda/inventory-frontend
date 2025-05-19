@@ -18,7 +18,7 @@ const Header = ({ user }: HeaderProps) => {
   ];
 
   return (
-    <header className="bg-white border-b border-gray-200">
+    <header className="bg-white border-b border-gray-200 sticky top-0 z-20">
       <div className="px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center flex-1">
@@ -94,7 +94,7 @@ const Header = ({ user }: HeaderProps) => {
                 >
                   <span className="sr-only">Open user menu</span>
                   <div className="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center text-white">
-                    {user?.name?.charAt(0) || <User size={18} />}
+                    {user?.firstName?.charAt(0) || <User size={18} />}
                   </div>
                 </button>
               </div>

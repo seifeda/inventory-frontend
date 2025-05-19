@@ -1,11 +1,26 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { API_ENDPOINTS } from '../config';
+import apiService from '../services/api';
+import { AxiosError } from 'axios';
 
 interface User {
-  id: string;
-  name: string;
+  id: number;
+  username: string;
   email: string;
+  firstName: string;
+  lastName: string;
   role: string;
+}
+
+interface LoginResponse {
+  id: number;
+  username: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  role: string;
+  token: string;
 }
 
 interface UserContextType {
@@ -27,11 +42,14 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Check if user is already logged in
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
-    if (storedUser) {
+    const token = localStorage.getItem('token');
+    if (storedUser && token) {
       try {
         setUser(JSON.parse(storedUser));
       } catch (e) {
         localStorage.removeItem('user');
+        localStorage.removeItem('token');
+        localStorage.removeItem('refreshToken');
         console.error('Invalid user data in localStorage');
       }
     }
@@ -42,28 +60,35 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setError(null);
     
     try {
-      // In a real implementation, this would be an API call
-      // For demo purposes, we'll simulate a successful login with mock data
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const response = await apiService.post<LoginResponse>(API_ENDPOINTS.auth.login, {
+        username: email,
+        password
+      });
       
-      // Simple validation for demo
-      if (email === 'admin@example.com' && password === 'password') {
-        const userData: User = {
-          id: '1',
-          name: 'Admin User',
-          email: 'admin@example.com',
-          role: 'admin',
-        };
-        
-        localStorage.setItem('user', JSON.stringify(userData));
-        setUser(userData);
-        navigate('/');
-      } else {
-        throw new Error('Invalid email or password');
-      }
+      const userData: User = {
+        id: response.id,
+        username: response.username,
+        email: response.email,
+        firstName: response.firstName,
+        lastName: response.lastName,
+        role: response.role
+      };
+      
+      // Store tokens and user data
+      localStorage.setItem('user', JSON.stringify(userData));
+      localStorage.setItem('token', response.token);
+      
+      setUser(userData);
+      navigate('/');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred during login');
-      console.error(err);
+      console.error('Login error:', err);
+      if (err instanceof AxiosError) {
+        setError(err.response?.data?.message || err.message);
+      } else if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('Failed to login. Please check your credentials and try again.');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -71,6 +96,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   
   const logout = () => {
     localStorage.removeItem('user');
+    localStorage.removeItem('token');
     setUser(null);
     navigate('/login');
   };

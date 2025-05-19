@@ -12,25 +12,28 @@ import Reports from './pages/Reports';
 import Login from './pages/Login';
 import { UserProvider } from './context/UserContext';
 import { InventoryProvider } from './context/InventoryContext';
+import { SalesProvider } from './context/SalesContext';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
   return (
     <UserProvider>
       <InventoryProvider>
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
-            <Route index element={<Dashboard />} />
-            <Route path="inventory" element={<Inventory />} />
-            <Route path="purchases" element={<Purchases />} />
-            <Route path="orders" element={<Orders />} />
-            <Route path="sales" element={<Sales />} />
-            <Route path="suppliers" element={<Suppliers />} />
-            <Route path="users" element={<Users />} />
-            <Route path="reports" element={<Reports />} />
-          </Route>
-        </Routes>
+        <SalesProvider>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
+              <Route index element={<Dashboard />} />
+              <Route path="inventory" element={<Inventory />} />
+              <Route path="purchases" element={<Purchases />} />
+              <Route path="orders" element={<Orders />} />
+              <Route path="sales" element={<Sales />} />
+              <Route path="suppliers" element={<Suppliers />} />
+              <Route path="users" element={<Users />} />
+              <Route path="reports" element={<Reports />} />
+            </Route>
+          </Routes>
+        </SalesProvider>
       </InventoryProvider>
     </UserProvider>
   );

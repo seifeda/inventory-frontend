@@ -6,8 +6,8 @@ import Alert from '../components/Alert';
 
 const Login = () => {
   const { login, isLoading, error } = useUser();
-  const [email, setEmail] = useState('admin@example.com');
-  const [password, setPassword] = useState('password');
+  const [email, setEmail] = useState('admin');
+  const [password, setPassword] = useState('admin123');
   
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,7 +39,7 @@ const Login = () => {
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                Email address
+                Username
               </label>
               <div className="mt-1 relative rounded-md shadow-sm">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -48,8 +48,8 @@ const Login = () => {
                 <input
                   id="email"
                   name="email"
-                  type="email"
-                  autoComplete="email"
+                  type="text"
+                  autoComplete="username"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -123,7 +123,7 @@ const Login = () => {
 
             <div className="mt-6">
               <div className="text-sm text-center text-gray-600">
-                Email: admin@example.com | Password: password
+                Username: admin | Password: admin123
               </div>
             </div>
           </div>
