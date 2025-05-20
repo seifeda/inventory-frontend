@@ -12,10 +12,5 @@ export const API_ENDPOINTS = {
     categories: '/api/inventory/categories',
     suppliers: '/api/inventory/suppliers'
   },
-  sales: {
-    base: '/api/sales',
-    report: '/api/sales/report',
-    dateRange: '/api/sales/date-range',
-    paymentMethod: '/api/sales/payment-method'
-  }
+
 }; 

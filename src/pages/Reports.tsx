@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { useSales } from '../context/SalesContext';
+
 import Card from '../components/Card';
 import Button from '../components/Button';
 import { BarChart, Calendar, Download, FileText, Filter, PieChart, TrendingUp } from 'lucide-react';
 
 const Reports = () => {
-  const { getSalesReport } = useSales();
+  
   const [selectedReport, setSelectedReport] = useState<string | null>(null);
   const [selectedPeriod, setSelectedPeriod] = useState('month');
   const [reportData, setReportData] = useState<any>(null);
@@ -46,12 +46,8 @@ const Reports = () => {
             startDate.setMonth(endDate.getMonth() - 1);
         }
         
-        const report = await getSalesReport(
-          startDate.toISOString(),
-          endDate.toISOString()
-        );
-        
-        setReportData(report);
+     
+       
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to generate report');
       } finally {
