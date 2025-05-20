@@ -7,7 +7,7 @@ type ButtonSize = 'xs' | 'sm' | 'md' | 'lg';
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;
   size?: ButtonSize;
-  icon?: LucideIcon;
+  icon?: typeof LucideIcon;
   iconPosition?: 'left' | 'right';
   fullWidth?: boolean;
   isLoading?: boolean;
