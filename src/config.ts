@@ -8,26 +8,25 @@ export const API_ENDPOINTS = {
   },
   inventory: {
     base: '/api/inventory',
-    items: '/api/inventory/items',
+    items: '/api/inventory',
     categories: '/api/inventory/categories',
     lowStock: '/api/inventory/low-stock'
   },
- 
   purchases: {
-    base: '/api/purchases',
-    orders: '/api/purchases/orders',
-    suppliers: '/api/purchases/suppliers',
-    status: '/api/purchases/status'
+    base: '/api/purchase',
+    orders: '/api/purchase',
+    suppliers: '/api/purchase/suppliers',
+    status: '/api/purchase/status'
   },
   orders: {
-    base: '/api/orders',
-    status: '/api/orders/status',
-    customer: '/api/orders/customer'
+    base: '/api/order',
+    status: '/api/order/status',
+    customer: '/api/order/customer'
   },
   suppliers: {
-    base: '/api/suppliers',
-    contacts: '/api/suppliers/contacts',
-    status: '/api/suppliers/status'
+    base: '/api/supplier',
+    contacts: '/api/supplier/contacts',
+    status: '/api/supplier/status'
   },
   users: {
     base: '/api/users',

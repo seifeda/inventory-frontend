@@ -114,6 +114,48 @@ export const InventoryProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     }
   };
 
+  const addInventoryItem = async (item: Omit<InventoryItem, 'id' | 'lastUpdated' | 'status'>) => {
+    try {
+      setIsLoading(true);
+      const response = await axios.post(`${API_URL}${API_ENDPOINTS.inventory.items}`, item);
+      setInventory(prev => [...prev, response.data]);
+      setError(null);
+    } catch (err) {
+      setError('Failed to add inventory item');
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const updateInventoryItem = async (id: number, updates: Partial<InventoryItem>) => {
+    try {
+      setIsLoading(true);
+      const response = await axios.put(`${API_URL}${API_ENDPOINTS.inventory.items}/${id}`, updates);
+      setInventory(prev => prev.map(item => item.id === id ? response.data : item));
+      setError(null);
+    } catch (err) {
+      setError('Failed to update inventory item');
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const deleteInventoryItem = async (id: number) => {
+    try {
+      setIsLoading(true);
+      await axios.delete(`${API_URL}${API_ENDPOINTS.inventory.items}/${id}`);
+      setInventory(prev => prev.filter(item => item.id !== id));
+      setError(null);
+    } catch (err) {
+      setError('Failed to delete inventory item');
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
     const fetchAllData = async () => {
       setIsLoading(true);
@@ -135,36 +177,6 @@ export const InventoryProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
     fetchAllData();
   }, []);
-
-  const addInventoryItem = async (item: Omit<InventoryItem, 'id' | 'lastUpdated' | 'status'>) => {
-    try {
-      const response = await axios.post(`${API_URL}${API_ENDPOINTS.inventory.items}`, item);
-      setInventory(prev => [...prev, response.data]);
-    } catch (err) {
-      setError('Failed to add inventory item');
-      throw err;
-    }
-  };
-
-  const updateInventoryItem = async (id: number, updates: Partial<InventoryItem>) => {
-    try {
-      const response = await axios.put(`${API_URL}${API_ENDPOINTS.inventory.items}/${id}`, updates);
-      setInventory(prev => prev.map(item => item.id === id ? response.data : item));
-    } catch (err) {
-      setError('Failed to update inventory item');
-      throw err;
-    }
-  };
-
-  const deleteInventoryItem = async (id: number) => {
-    try {
-      await axios.delete(`${API_URL}${API_ENDPOINTS.inventory.items}/${id}`);
-      setInventory(prev => prev.filter(item => item.id !== id));
-    } catch (err) {
-      setError('Failed to delete inventory item');
-      throw err;
-    }
-  };
 
   return (
     <InventoryContext.Provider 

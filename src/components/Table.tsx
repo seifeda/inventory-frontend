@@ -11,6 +11,7 @@ type TableProps = {
   data: any[];
   onRowClick?: (row: any) => void;
   actions?: React.ReactNode;
+  rowActions?: (row: any) => React.ReactNode;
   pagination?: {
     totalPages: number;
     currentPage: number;
@@ -25,6 +26,7 @@ const Table = ({
   data, 
   onRowClick, 
   actions,
+  rowActions,
   pagination,
   searchable = false,
   onSearch
@@ -115,9 +117,11 @@ const Table = ({
                   </div>
                 </th>
               ))}
-              <th scope="col" className="relative px-6 py-3">
-                <span className="sr-only">Actions</span>
-              </th>
+              {rowActions && (
+                <th scope="col" className="relative px-6 py-3">
+                  <span className="sr-only">Actions</span>
+                </th>
+              )}
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
@@ -133,16 +137,16 @@ const Table = ({
                       {column.render ? column.render(row[column.key], row) : row[column.key]}
                     </td>
                   ))}
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <button className="text-gray-400 hover:text-gray-500">
-                      <MoreHorizontal size={16} />
-                    </button>
-                  </td>
+                  {rowActions && (
+                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      {rowActions(row)}
+                    </td>
+                  )}
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan={columns.length + 1} className="px-6 py-4 text-center text-sm text-gray-500">
+                <td colSpan={columns.length + (rowActions ? 1 : 0)} className="px-6 py-4 text-center text-sm text-gray-500">
                   No data available
                 </td>
               </tr>

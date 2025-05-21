@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useInventory } from '../context/InventoryContext';
+import { useInventory, InventoryItem } from '../context/InventoryContext';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Table from '../components/Table';
 import Button from '../components/Button';
@@ -9,7 +9,7 @@ import Alert from '../components/Alert';
 import { Plus, Filter, Download, Trash2, Edit, Eye, ArrowUpDown } from 'lucide-react';
 
 const Inventory = () => {
-  const { inventory, addInventoryItem, updateInventoryItem, deleteInventoryItem, isLoading } = useInventory();
+  const { inventory, addInventoryItem, updateInventoryItem, deleteInventoryItem, isLoading, error } = useInventory();
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
@@ -62,29 +62,41 @@ const Inventory = () => {
     setFilteredInventory(filtered);
   }, [inventory, categoryFilter, statusFilter, searchQuery]);
   
-  const handleAddItem = (data: any) => {
-    addInventoryItem(data);
-    setIsAddModalOpen(false);
-    setAlert({ type: 'success', message: 'Item added successfully' });
+  const handleAddItem = async (data: any) => {
+    try {
+      await addInventoryItem(data);
+      setIsAddModalOpen(false);
+      setAlert({ type: 'success', message: 'Item added successfully' });
+    } catch (err) {
+      setAlert({ type: 'error', message: 'Failed to add item' });
+    }
     // Hide alert after 3 seconds
     setTimeout(() => setAlert(null), 3000);
   };
   
-  const handleUpdateItem = (data: any) => {
+  const handleUpdateItem = async (data: any) => {
     if (currentItem) {
-      updateInventoryItem(currentItem.id, data);
-      setIsEditModalOpen(false);
-      setAlert({ type: 'success', message: 'Item updated successfully' });
+      try {
+        await updateInventoryItem(currentItem.id, data);
+        setIsEditModalOpen(false);
+        setAlert({ type: 'success', message: 'Item updated successfully' });
+      } catch (err) {
+        setAlert({ type: 'error', message: 'Failed to update item' });
+      }
       // Hide alert after 3 seconds
       setTimeout(() => setAlert(null), 3000);
     }
   };
   
-  const handleDeleteItem = () => {
+  const handleDeleteItem = async () => {
     if (currentItem) {
-      deleteInventoryItem(currentItem.id);
-      setIsDeleteModalOpen(false);
-      setAlert({ type: 'success', message: 'Item deleted successfully' });
+      try {
+        await deleteInventoryItem(currentItem.id);
+        setIsDeleteModalOpen(false);
+        setAlert({ type: 'success', message: 'Item deleted successfully' });
+      } catch (err) {
+        setAlert({ type: 'error', message: 'Failed to delete item' });
+      }
       // Hide alert after 3 seconds
       setTimeout(() => setAlert(null), 3000);
     }
@@ -95,7 +107,7 @@ const Inventory = () => {
   };
   
   // Get unique categories for filter
-  const categories = ['all', ...new Set(inventory.map(item => item.category))];
+  const categories = ['all', ...Array.from(new Set(inventory.map(item => item.category)))];
   
   // Table columns definition
   const columns = [
@@ -115,82 +127,20 @@ const Inventory = () => {
     ) },
   ];
   
-  // Action buttons for the table
-  const actions = (
-    <>
-      <Button 
-        variant="primary" 
-        size="sm" 
-        icon={Plus} 
-        onClick={() => setIsAddModalOpen(true)}
-      >
-        Add Item
-      </Button>
-      <Button 
-        variant="outline" 
-        size="sm" 
-        icon={Filter}
-        onClick={() => console.log('Show filter')}
-      >
-        Filter
-      </Button>
-      <Button 
-        variant="outline" 
-        size="sm" 
-        icon={Download}
-        onClick={() => console.log('Export')}
-      >
-        Export
-      </Button>
-    </>
-  );
-  
-  // Row actions
-  const rowActions = (row: any) => (
-    <div className="flex space-x-2">
-      <Button 
-        variant="outline" 
-        size="xs" 
-        icon={Eye}
-        onClick={(e) => {
-          e.stopPropagation();
-          setCurrentItem(row);
-          setIsViewModalOpen(true);
-        }}
-      >
-        View
-      </Button>
-      <Button 
-        variant="outline" 
-        size="xs" 
-        icon={Edit}
-        onClick={(e) => {
-          e.stopPropagation();
-          setCurrentItem(row);
-          setIsEditModalOpen(true);
-        }}
-      >
-        Edit
-      </Button>
-      <Button 
-        variant="outline" 
-        size="xs" 
-        icon={Trash2}
-        onClick={(e) => {
-          e.stopPropagation();
-          setCurrentItem(row);
-          setIsDeleteModalOpen(true);
-        }}
-      >
-        Delete
-      </Button>
-    </div>
-  );
-  
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+  
+  if (error) {
+    return (
+      <div className="p-4">
+        <Alert variant="error" dismissible onDismiss={() => setAlert(null)}>
+          {error}
+        </Alert>
       </div>
     );
   }
@@ -257,18 +207,80 @@ const Inventory = () => {
       <Table 
         columns={columns} 
         data={filteredInventory}
-        actions={actions}
-        onRowClick={(row) => {
+        onRowClick={(row: InventoryItem) => {
           setCurrentItem(row);
           setIsViewModalOpen(true);
         }}
         searchable
         onSearch={handleSearch}
-        pagination={{
-          totalPages: Math.ceil(filteredInventory.length / 10) || 1,
-          currentPage: 1,
-          onPageChange: (page) => console.log('Page changed to', page)
-        }}
+        actions={
+          <div className="flex space-x-2">
+            <Button 
+              variant="primary" 
+              size="sm" 
+              icon={Plus} 
+              onClick={() => setIsAddModalOpen(true)}
+            >
+              Add Item
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              icon={Filter}
+              onClick={() => console.log('Show filter')}
+            >
+              Filter
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              icon={Download}
+              onClick={() => console.log('Export')}
+            >
+              Export
+            </Button>
+          </div>
+        }
+        rowActions={(row: InventoryItem) => (
+          <div className="flex space-x-2">
+            <Button 
+              variant="outline" 
+              size="xs" 
+              icon={Eye}
+              onClick={(e) => {
+                e.stopPropagation();
+                setCurrentItem(row);
+                setIsViewModalOpen(true);
+              }}
+            >
+              View
+            </Button>
+            <Button 
+              variant="outline" 
+              size="xs" 
+              icon={Edit}
+              onClick={(e) => {
+                e.stopPropagation();
+                setCurrentItem(row);
+                setIsEditModalOpen(true);
+              }}
+            >
+              Edit
+            </Button>
+            <Button 
+              variant="outline" 
+              size="xs" 
+              icon={Trash2}
+              onClick={(e) => {
+                e.stopPropagation();
+                setCurrentItem(row);
+                setIsDeleteModalOpen(true);
+              }}
+            >
+              Delete
+            </Button>
+          </div>
+        )}
       />
       
       {/* Add Item Modal */}
@@ -409,7 +421,7 @@ const Inventory = () => {
                   </div>
                   <div>
                     <p className="text-xs text-gray-500">Supplier</p>
-                    <p className="text-sm font-medium">{currentItem.supplier || 'N/A'}</p>
+                    <p className="text-sm font-medium">{currentItem.supplier?.name || 'N/A'}</p>
                   </div>
                   <div>
                     <p className="text-xs text-gray-500">Last Updated</p>

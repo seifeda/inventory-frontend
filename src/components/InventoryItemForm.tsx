@@ -15,12 +15,11 @@ const InventoryItemForm = ({ onSubmit, onCancel, initialData, isLoading = false 
     sku: initialData?.sku || '',
     category: initialData?.category || '',
     description: initialData?.description || '',
-    price: initialData?.price || '',
-    costPrice: initialData?.costPrice || '',
-    quantity: initialData?.quantity || '',
-    reorderPoint: initialData?.reorderPoint || '',
+    unitPrice: initialData?.unitPrice || '',
+    quantityInStock: initialData?.quantityInStock || '',
+    minimumStockLevel: initialData?.minimumStockLevel || '',
+    supplierId: initialData?.supplierId || '',
     location: initialData?.location || '',
-    supplier: initialData?.supplier || '',
     image: initialData?.image || ''
   });
   
@@ -47,20 +46,16 @@ const InventoryItemForm = ({ onSubmit, onCancel, initialData, isLoading = false 
     if (!formData.sku.trim()) newErrors.sku = 'SKU is required';
     if (!formData.category) newErrors.category = 'Category is required';
     
-    if (formData.price && isNaN(Number(formData.price))) {
-      newErrors.price = 'Price must be a number';
+    if (formData.unitPrice && isNaN(Number(formData.unitPrice))) {
+      newErrors.unitPrice = 'Unit price must be a number';
     }
     
-    if (formData.costPrice && isNaN(Number(formData.costPrice))) {
-      newErrors.costPrice = 'Cost price must be a number';
+    if (formData.quantityInStock && isNaN(Number(formData.quantityInStock))) {
+      newErrors.quantityInStock = 'Quantity in stock must be a number';
     }
     
-    if (formData.quantity && isNaN(Number(formData.quantity))) {
-      newErrors.quantity = 'Quantity must be a number';
-    }
-    
-    if (formData.reorderPoint && isNaN(Number(formData.reorderPoint))) {
-      newErrors.reorderPoint = 'Reorder point must be a number';
+    if (formData.minimumStockLevel && isNaN(Number(formData.minimumStockLevel))) {
+      newErrors.minimumStockLevel = 'Minimum stock level must be a number';
     }
     
     setErrors(newErrors);
@@ -89,11 +84,11 @@ const InventoryItemForm = ({ onSubmit, onCancel, initialData, isLoading = false 
   ];
   
   const suppliers = [
-    'Acme Supplies',
-    'Global Distribution Inc.',
-    'Tech Components Ltd.',
-    'Office Essentials Co.',
-    'Premium Materials'
+    { id: 1, name: 'Acme Supplies' },
+    { id: 2, name: 'Global Distribution Inc.' },
+    { id: 3, name: 'Tech Components Ltd.' },
+    { id: 4, name: 'Office Essentials Co.' },
+    { id: 5, name: 'Premium Materials' }
   ];
   
   const locations = [
@@ -164,26 +159,26 @@ const InventoryItemForm = ({ onSubmit, onCancel, initialData, isLoading = false 
         </div>
         
         <div>
-          <label htmlFor="supplier" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="supplierId" className="block text-sm font-medium text-gray-700">
             Supplier
           </label>
           <select
-            id="supplier"
-            name="supplier"
-            value={formData.supplier}
+            id="supplierId"
+            name="supplierId"
+            value={formData.supplierId}
             onChange={handleChange}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
           >
             <option value="">Select a supplier</option>
             {suppliers.map(supplier => (
-              <option key={supplier} value={supplier}>{supplier}</option>
+              <option key={supplier.id} value={supplier.id}>{supplier.name}</option>
             ))}
           </select>
         </div>
         
         <div>
-          <label htmlFor="price" className="block text-sm font-medium text-gray-700">
-            Selling Price
+          <label htmlFor="unitPrice" className="block text-sm font-medium text-gray-700">
+            Unit Price
           </label>
           <div className="mt-1 relative rounded-md shadow-sm">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -191,74 +186,51 @@ const InventoryItemForm = ({ onSubmit, onCancel, initialData, isLoading = false 
             </div>
             <input
               type="text"
-              name="price"
-              id="price"
-              value={formData.price}
+              name="unitPrice"
+              id="unitPrice"
+              value={formData.unitPrice}
               onChange={handleChange}
               className={`block w-full pl-7 rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-500 sm:text-sm ${
-                errors.price ? 'border-red-300' : ''
+                errors.unitPrice ? 'border-red-300' : ''
               }`}
               placeholder="0.00"
             />
           </div>
-          {errors.price && <p className="mt-2 text-sm text-red-600">{errors.price}</p>}
+          {errors.unitPrice && <p className="mt-2 text-sm text-red-600">{errors.unitPrice}</p>}
         </div>
         
         <div>
-          <label htmlFor="costPrice" className="block text-sm font-medium text-gray-700">
-            Cost Price
-          </label>
-          <div className="mt-1 relative rounded-md shadow-sm">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <span className="text-gray-500 sm:text-sm">$</span>
-            </div>
-            <input
-              type="text"
-              name="costPrice"
-              id="costPrice"
-              value={formData.costPrice}
-              onChange={handleChange}
-              className={`block w-full pl-7 rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-500 sm:text-sm ${
-                errors.costPrice ? 'border-red-300' : ''
-              }`}
-              placeholder="0.00"
-            />
-          </div>
-          {errors.costPrice && <p className="mt-2 text-sm text-red-600">{errors.costPrice}</p>}
-        </div>
-        
-        <div>
-          <label htmlFor="quantity" className="block text-sm font-medium text-gray-700">
-            Quantity
+          <label htmlFor="quantityInStock" className="block text-sm font-medium text-gray-700">
+            Quantity in Stock
           </label>
           <input
             type="text"
-            name="quantity"
-            id="quantity"
-            value={formData.quantity}
+            name="quantityInStock"
+            id="quantityInStock"
+            value={formData.quantityInStock}
             onChange={handleChange}
             className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm ${
-              errors.quantity ? 'border-red-300' : ''
+              errors.quantityInStock ? 'border-red-300' : ''
             }`}
           />
-          {errors.quantity && <p className="mt-2 text-sm text-red-600">{errors.quantity}</p>}
+          {errors.quantityInStock && <p className="mt-2 text-sm text-red-600">{errors.quantityInStock}</p>}
         </div>
         
         <div>
-          <label htmlFor="reorderPoint" className="block text-sm font-medium text-gray-700">
-            Reorder Point
+          <label htmlFor="minimumStockLevel" className="block text-sm font-medium text-gray-700">
+            Minimum Stock Level
           </label>
           <input
             type="text"
-            name="reorderPoint"
-            id="reorderPoint"
-            value={formData.reorderPoint}
+            name="minimumStockLevel"
+            id="minimumStockLevel"
+            value={formData.minimumStockLevel}
             onChange={handleChange}
             className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm ${
-              errors.reorderPoint ? 'border-red-300' : ''
+              errors.minimumStockLevel ? 'border-red-300' : ''
             }`}
           />
-          {errors.reorderPoint && <p className="mt-2 text-sm text-red-600">{errors.reorderPoint}</p>}
+          {errors.minimumStockLevel && <p className="mt-2 text-sm text-red-600">{errors.minimumStockLevel}</p>}
         </div>
         
         <div>
