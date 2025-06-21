@@ -15,13 +15,16 @@ const Modal = ({ isOpen, onClose, title, children, footer, size = 'md' }: ModalP
   const [isShowing, setIsShowing] = useState(false);
   
   useEffect(() => {
+    console.log('Modal useEffect - isOpen:', isOpen);
     let timeoutId: ReturnType<typeof setTimeout>;
     
     if (isOpen) {
+      console.log('Setting modal to show');
       setIsShowing(true);
       // Lock body scroll
       document.body.style.overflow = 'hidden';
     } else {
+      console.log('Setting modal to hide');
       timeoutId = setTimeout(() => {
         setIsShowing(false);
         // Restore body scroll
@@ -35,7 +38,12 @@ const Modal = ({ isOpen, onClose, title, children, footer, size = 'md' }: ModalP
     };
   }, [isOpen]);
   
-  if (!isShowing) return null;
+  console.log('Modal render - isShowing:', isShowing, 'isOpen:', isOpen);
+  
+  if (!isShowing) {
+    console.log('Modal not showing, returning null');
+    return null;
+  }
   
   const sizeClasses = {
     sm: 'max-w-sm',
